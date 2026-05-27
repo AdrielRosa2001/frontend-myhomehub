@@ -4,6 +4,8 @@ import { api } from "@/lib/api";
 import { addMonths, endOfMonth, format, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
+  CheckCircle2,
+  Circle,
   DollarSign,
   Filter,
   LogOut,
@@ -51,6 +53,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -70,6 +73,7 @@ interface Transaction {
   type: "receita" | "despesa";
   category: string;
   date: string;
+  is_paid: boolean;
 }
 
 interface Summary {
@@ -130,14 +134,17 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       const params = new URLSearchParams();
+
       if (filterStartDate) params.append("start_date", filterStartDate);
       if (filterEndDate) params.append("end_date", filterEndDate);
       if (filterType !== "all") params.append("type", filterType);
       if (filterCategory !== "all") params.append("category", filterCategory);
+
       if (filterMinAmount) params.append("min_amount", filterMinAmount);
       if (filterMaxAmount) params.append("max_amount", filterMaxAmount);
 
       const queryString = params.toString();
+
       const txUrl = queryString
         ? `/transactions/?${queryString}`
         : `/transactions/`;
@@ -183,7 +190,9 @@ export default function DashboardPage() {
       category: "Geral",
       amount: 0,
       description: "",
+      is_paid: false,
     });
+
     setIsAddEditOpen(true);
   };
 
@@ -216,6 +225,7 @@ export default function DashboardPage() {
 
   const handleDelete = async () => {
     if (!txToDelete) return;
+
     try {
       await api.delete(`/transactions/${txToDelete}`);
       toast.success("Transação excluída com sucesso!");
@@ -293,6 +303,7 @@ export default function DashboardPage() {
                       className="bg-zinc-900 border-zinc-800 h-8 text-sm dark:[color-scheme:dark]"
                     />
                   </div>
+
                   <div className="space-y-1">
                     <label className="text-xs text-slate-400">Data Final</label>
                     <Input
@@ -303,11 +314,13 @@ export default function DashboardPage() {
                     />
                   </div>
                 </div>
+
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
                     <label className="text-xs text-slate-400">
                       Valor Mínimo
                     </label>
+
                     <Input
                       type="number"
                       placeholder="R$ 0,00"
@@ -331,6 +344,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs text-slate-400">Tipo</label>
+
                   <Select value={filterType} onValueChange={setFilterType}>
                     <SelectTrigger className="h-8 bg-zinc-900 border-zinc-800">
                       <SelectValue />
@@ -407,7 +421,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div
-              className={`text-2xl font-bold ${summary.saldo >= 0 ? "text-emerald-500" : "text-red-500"}`}
+              className={`text-2xl font-bold ${
+                summary.saldo >= 0 ? "text-emerald-500" : "text-red-500"
+              }`}
             >
               {formatCurrency(summary.saldo)}
             </div>
@@ -449,6 +465,7 @@ export default function DashboardPage() {
                 <TableHead className="text-slate-400">Data</TableHead>
                 <TableHead className="text-slate-400">Descrição</TableHead>
                 <TableHead className="text-slate-400">Categoria</TableHead>
+                <TableHead className="text-slate-400">Status</TableHead>
                 <TableHead className="text-slate-400 text-right">
                   Valor
                 </TableHead>
@@ -461,7 +478,7 @@ export default function DashboardPage() {
               {transactions.map((tx) => (
                 <TableRow
                   key={tx.id}
-                  className="border-zinc-800 hover:bg-zinc-900/50"
+                  className={`border-zinc-800 hover:bg-zinc-900/50 transition-opacity ${!tx.is_paid ? "opacity-50" : ""}`}
                 >
                   <TableCell>
                     {format(new Date(tx.date), "dd/MM/yyyy")}
@@ -474,8 +491,26 @@ export default function DashboardPage() {
                       {tx.category}
                     </span>
                   </TableCell>
+
+                  {/* Status Cell */}
+                  <TableCell>
+                    {tx.is_paid ? (
+                      <span className="flex items-center text-xs text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full w-fit">
+                        <CheckCircle2 className="w-3 h-3 mr-1" /> Pago
+                      </span>
+                    ) : (
+                      <span className="flex items-center text-xs text-amber-500 bg-amber-500/10 px-2 py-1 rounded-full w-fit">
+                        <Circle className="w-3 h-3 mr-1" /> Pendente
+                      </span>
+                    )}
+                  </TableCell>
+
                   <TableCell
-                    className={`text-right font-medium ${tx.type === "receita" ? "text-emerald-500" : "text-red-500"}`}
+                    className={`text-right font-medium ${
+                      tx.type === "receita"
+                        ? "text-emerald-500"
+                        : "text-red-500"
+                    }`}
                   >
                     {tx.type === "receita" ? "+" : "-"}
                     {formatCurrency(tx.amount)}
@@ -500,10 +535,11 @@ export default function DashboardPage() {
                   </TableCell>
                 </TableRow>
               ))}
+
               {transactions.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={6}
                     className="text-center text-slate-500 py-8"
                   >
                     Nenhuma transação encontrada.
@@ -568,25 +604,47 @@ export default function DashboardPage() {
                 </Select>
               </div>
             </div>
-            <div className="grid gap-2">
-              <label className="text-sm font-medium">Categoria</label>
-              <Input
-                className="bg-zinc-900 border-zinc-800"
-                value={currentTx?.category || ""}
-                onChange={(e) =>
-                  setCurrentTx({ ...currentTx, category: e.target.value })
-                }
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Categoria</label>
+                <Input
+                  className="bg-zinc-900 border-zinc-800"
+                  value={currentTx?.category || ""}
+                  onChange={(e) =>
+                    setCurrentTx({ ...currentTx, category: e.target.value })
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Data</label>
+                <Input
+                  type="date"
+                  className="bg-zinc-900 border-zinc-800 dark:[color-scheme:dark]"
+                  value={currentTx?.date || ""}
+                  onChange={(e) =>
+                    setCurrentTx({ ...currentTx, date: e.target.value })
+                  }
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <label className="text-sm font-medium">Data</label>
-              <Input
-                type="date"
-                className="bg-zinc-900 border-zinc-800 dark:[color-scheme:dark]"
-                value={currentTx?.date || ""}
-                onChange={(e) =>
-                  setCurrentTx({ ...currentTx, date: e.target.value })
+
+            {/* Componente do Switch de Pago/Pendente */}
+            <div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/50 p-3 mt-2">
+              <div className="space-y-0.5">
+                <label className="text-sm font-medium text-slate-50">
+                  Transação Efetivada?
+                </label>
+                <p className="text-xs text-slate-400">
+                  Marque caso o valor já tenha sido pago/recebido.
+                </p>
+              </div>
+              <Switch
+                checked={currentTx?.is_paid || false}
+                onCheckedChange={(checked) =>
+                  setCurrentTx({ ...currentTx, is_paid: checked })
                 }
+                className="data-[state=checked]:bg-emerald-500"
               />
             </div>
           </div>
