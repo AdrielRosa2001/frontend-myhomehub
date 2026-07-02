@@ -406,8 +406,8 @@ function ListCard({
   onClick: () => void;
 }) {
   const typeInfo = typeIcons[list.type];
-  const completed = list.completed_count ?? 0;
-  const total = list.item_count ?? 0;
+  const completed = (list as List & { completed_count?: number }).completed_count ?? 0;
+  const total = (list as List & { item_count?: number }).item_count ?? 0;
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (

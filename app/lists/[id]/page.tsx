@@ -86,7 +86,8 @@ export default function ListDetailPage() {
       ]);
       setList(listRes.data);
       setItems(itemsRes.data);
-    } catch {
+    } catch (err: unknown) {
+      const error = err as { response?: { status?: number } };
       if (error.response?.status === 401) {
         toast.error("Sessão expirada. Faça login novamente.");
         router.push("/login");
