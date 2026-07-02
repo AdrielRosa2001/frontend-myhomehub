@@ -1,7 +1,7 @@
 {
-  "name": "MyFinance",
-  "short_name": "MyFinance",
-  "description": "Controle de Gastos e Finanças",
+  "name": "MyHomeHub",
+  "short_name": "MyHomeHub",
+  "description": "Gestão Financeira, Listas e mais",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

@@ -127,4 +127,8 @@
   html {
     @apply font-sans;
   }
+  /* iOS Safari: impede zoom automático ao focar em inputs */
+  input, select, textarea, [data-slot="input"] {
+    font-size: 16px !important;
+  }
 }

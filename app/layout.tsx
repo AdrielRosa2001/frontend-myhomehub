@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import AppShell from "@/components/AppShell";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -17,13 +18,13 @@ const geistMono = Geist_Mono({
 
 // 1. Configuração do PWA e iOS
 export const metadata: Metadata = {
-  title: "MyFinance",
-  description: "Controle de Gastos e Finanças",
+  title: "MyHomeHub",
+  description: "Gestão Financeira, Listas e mais",
   manifest: "/manifest.json", // Chama o arquivo do Android
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "MyFinance",
+    title: "MyHomeHub",
   },
 };
 
@@ -267,7 +268,7 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        {children}
+        <AppShell>{children}</AppShell>
         <Toaster theme="dark" richColors position="bottom-right" />
       </body>
     </html>

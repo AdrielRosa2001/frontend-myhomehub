@@ -1,0 +1,93 @@
+name: Frontend MyHomeHub — CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  # ════════════════════════════════════════════════════════════
+  # JOB 1: Lint + TypeScript + Testes + Build
+  # ════════════════════════════════════════════════════════════
+  validation:
+    name: Lint, Typecheck, Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Notificar início do CI no Telegram
+        if: github.event_name == 'push'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TO_TOKEN }}
+          format: markdown
+          message: |
+            🚀 *CI/CD Frontend MyHomeHub Iniciado!*
+            👤 Autor: ${{ github.actor }}
+            📝 Commit: `${{ github.event.head_commit.message }}`
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Testes unitários
+        run: npm run test:coverage
+
+      - name: Build Next.js
+        env:
+          NEXT_PUBLIC_API_URL: /api
+        run: npm run build
+
+  # ════════════════════════════════════════════════════════════
+  # JOB 2: Deploy (VPS via self-hosted runner)
+  # ════════════════════════════════════════════════════════════
+  deploy:
+    name: Deploy na VPS
+    needs: validation
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+
+    steps:
+      - name: Disparar deploy
+        run: /home/ubuntu/scripts/deploy-frontend-myhomehub.sh
+
+      - name: Notificar sucesso no Telegram
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TO_TOKEN }}
+          format: markdown
+          message: |
+            ✅ *Deploy do Frontend MyHomeHub foi finalizado com sucesso!*
+            🌐 A nova build do Next.js foi gerada e atualizada no Docker da VPS.
+
+      - name: Notificar falha no Telegram
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TO_TOKEN }}
+          format: markdown
+          message: |
+            🚨 *Erro no CI/CD do Frontend MyHomeHub!*
+            ❌ O pipeline falhou. Verifique os logs no GitHub Actions para ver se quebrou no Lint, Typecheck, Testes ou no Deploy da VPS.

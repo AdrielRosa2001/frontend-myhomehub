@@ -50,9 +50,9 @@ export default function LoginPage() {
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-zinc-950 border-zinc-800 text-slate-50">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">MyFinance</CardTitle>
+          <CardTitle className="text-2xl text-center">MyHomeHub</CardTitle>
           <CardDescription className="text-center text-slate-400">
-            Entre com suas credenciais para acessar o controle financeiro
+            Entre com suas credenciais para acessar o sistema
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
