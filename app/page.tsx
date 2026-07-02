@@ -1,6 +1,6 @@
 "use client";
 
-import { DollarSign, LayoutDashboard, ListTodo, LogOut } from "lucide-react";
+import { DollarSign, ListTodo, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
