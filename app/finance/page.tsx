@@ -2,6 +2,7 @@
 
 import { api } from "@/lib/api";
 import { addMonths, endOfMonth, format, startOfMonth } from "date-fns";
+
 import {
   CheckCircle2,
   Circle,
@@ -209,7 +210,6 @@ export default function FinanceiroPage() {
       setChartData(chartRes.data?.data || chartRes.data || []);
       setSelectedTxIds([]); // Limpa seleções ao carregar os dados
       setIsFilterOpen(false); // Fecha o modal de filtro ao aplicar
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error("Sessão expirada. Faça login novamente.");
@@ -220,18 +220,13 @@ export default function FinanceiroPage() {
     }
   };
 
-  // Auth check
   useEffect(() => {
     const token = localStorage.getItem("dmapla_token");
     if (!token) {
       router.push("/login");
+    } else {
+      fetchData();
     }
-  }, [router]);
-
-  // Data fetch
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handlers para os Modais de Adição e Edição

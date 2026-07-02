@@ -86,7 +86,6 @@ export default function ListDetailPage() {
       ]);
       setList(listRes.data);
       setItems(itemsRes.data);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch {
       if (error.response?.status === 401) {
         toast.error("Sessão expirada. Faça login novamente.");
@@ -104,11 +103,9 @@ export default function ListDetailPage() {
     if (!token) {
       router.push("/login");
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchList();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchList, router]);
 
   // Foco no input ao carregar
   useEffect(() => {
@@ -243,6 +240,7 @@ export default function ListDetailPage() {
 
   const completedCount = items.filter((i) => i.is_completed).length;
   const totalCount = items.length;
+  const filteredCount = filteredItems.length;
   const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const typeInfo = list ? typeIcons[list.type] || typeIcons.bullet : typeIcons.bullet;
 
@@ -496,3 +494,126 @@ export default function ListDetailPage() {
                       onChange={(e) =>
                         setEditingItem((prev) => ({
                           ...prev,
+                          quantity: e.target.value ? parseFloat(e.target.value) : undefined,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium">Unidade</label>
+                    <Input
+                      className="bg-zinc-900 border-zinc-800"
+                      placeholder="kg, L, un, cx..."
+                      value={editingItem?.unit || ""}
+                      onChange={(e) =>
+                        setEditingItem((prev) => ({ ...prev, unit: e.target.value }))
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Categoria</label>
+                  <Input
+                    className="bg-zinc-900 border-zinc-800"
+                    placeholder="Ex: Hortifrúti, Limpeza..."
+                    value={editingItem?.category || ""}
+                    onChange={(e) =>
+                      setEditingItem((prev) => ({ ...prev, category: e.target.value }))
+                    }
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Campos específicos para tipo todo */}
+            {list.type === "todo" && (
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Prioridade</label>
+                <Select
+                  value={editingItem?.priority || "medium"}
+                  onValueChange={(val) =>
+                    val && setEditingItem((prev) => ({ ...prev, priority: val as "low" | "medium" | "high" }))
+                  }
+                >
+                  <SelectTrigger className="bg-zinc-900 border-zinc-800">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
+                    <SelectItem value="low">Baixa</SelectItem>
+                    <SelectItem value="medium">Média</SelectItem>
+                    <SelectItem value="high">Alta</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="bg-transparent border-zinc-800 text-white"
+              onClick={() => {
+                setIsItemEditOpen(false);
+                setEditingItem(null);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="bg-white text-black hover:bg-slate-200"
+              onClick={handleSaveItem}
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Confirmar Exclusão de Item */}
+      <AlertDialog open={isDeleteItemOpen} onOpenChange={setIsDeleteItemOpen}>
+        <AlertDialogContent className="bg-zinc-950 border-zinc-800 text-slate-50">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">
+              Este item será permanentemente excluído da lista.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-transparent border-zinc-800 text-white hover:bg-zinc-900 hover:text-white">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={handleDeleteItem}
+            >
+              Sim, excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Modal Confirmar Exclusão da Lista */}
+      <AlertDialog open={isDeleteListOpen} onOpenChange={setIsDeleteListOpen}>
+        <AlertDialogContent className="bg-zinc-950 border-zinc-800 text-slate-50">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">
+              Esta ação não pode ser desfeita. A lista e todos os seus itens serão
+              permanentemente excluídos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-transparent border-zinc-800 text-white hover:bg-zinc-900 hover:text-white">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={handleDeleteList}
+            >
+              Sim, excluir tudo
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
