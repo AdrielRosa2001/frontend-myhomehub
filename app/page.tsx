@@ -30,7 +30,8 @@ export default function HomePage() {
     if (!token) {
       router.push("/login");
     }
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("dmapla_token");

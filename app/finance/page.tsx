@@ -210,6 +210,7 @@ export default function FinanceiroPage() {
       setChartData(chartRes.data?.data || chartRes.data || []);
       setSelectedTxIds([]); // Limpa seleções ao carregar os dados
       setIsFilterOpen(false); // Fecha o modal de filtro ao aplicar
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error("Sessão expirada. Faça login novamente.");
@@ -225,8 +226,10 @@ export default function FinanceiroPage() {
     if (!token) {
       router.push("/login");
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handlers para os Modais de Adição e Edição

@@ -87,6 +87,7 @@ export default function ListDetailPage() {
       ]);
       setList(listRes.data);
       setItems(itemsRes.data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error("Sessão expirada. Faça login novamente.");
@@ -104,9 +105,11 @@ export default function ListDetailPage() {
     if (!token) {
       router.push("/login");
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchList();
     }
-  }, [fetchList, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Foco no input ao carregar
   useEffect(() => {

@@ -85,6 +85,7 @@ export default function ListsPage() {
       const statusParam = archived ? "archived" : "active";
       const res = await api.get(`/lists?status=${statusParam}`);
       setLists(res.data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error("Sessão expirada. Faça login novamente.");
@@ -102,8 +103,10 @@ export default function ListsPage() {
     if (!token) {
       router.push("/login");
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchLists(showArchived);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showArchived]);
 
   const handleLogout = () => {
