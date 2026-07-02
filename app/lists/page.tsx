@@ -148,7 +148,7 @@
 149|      setIsCreateOpen(false);
 150|      setEditingList(null);
 151|      fetchLists();
-152|    } catch (error) {
+152|    } catch {
 153|      toast.error("Erro ao salvar lista.");
 154|    }
 155|  };
@@ -159,7 +159,7 @@
 160|      await api.post(`/lists/${id}/archive`);
 161|      toast.success("Lista atualizada!");
 162|      fetchLists(showArchived);
-163|    } catch (error) {
+163|    } catch {
 164|      toast.error("Erro ao atualizar lista.");
 165|    }
 166|  };
@@ -170,7 +170,7 @@
 171|      await api.post(`/lists/${id}/duplicate`);
 172|      toast.success("Lista duplicada!");
 173|      fetchLists(showArchived);
-174|    } catch (error) {
+174|    } catch {
 175|      toast.error("Erro ao duplicar lista.");
 176|    }
 177|  };
@@ -189,7 +189,7 @@
 190|      setIsDeleteOpen(false);
 191|      setListToDelete(null);
 192|      fetchLists(showArchived);
-193|    } catch (error) {
+193|    } catch {
 194|      toast.error("Erro ao excluir lista.");
 195|    }
 196|  };

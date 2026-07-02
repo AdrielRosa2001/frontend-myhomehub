@@ -39,7 +39,7 @@ export default function LoginPage() {
       localStorage.setItem("dmapla_token", response.data.access_token);
       toast.success("Login efetuado com sucesso!");
       router.push("/");
-    } catch (error) {
+    } catch {
       toast.error("Credenciais inválidas. Tente novamente.");
     } finally {
       setLoading(false);

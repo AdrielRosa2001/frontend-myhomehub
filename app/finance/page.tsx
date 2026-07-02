@@ -2,7 +2,6 @@
 
 import { api } from "@/lib/api";
 import { addMonths, endOfMonth, format, startOfMonth } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import {
   CheckCircle2,
   Circle,
@@ -98,7 +97,7 @@ export default function FinanceiroPage() {
     total_despesas: 0,
     saldo: 0,
   });
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<Record<string, number>[]>([]);
 
   // Estados de Filtros
   const [filterStartDate, setFilterStartDate] = useState(
@@ -108,7 +107,7 @@ export default function FinanceiroPage() {
     format(endOfMonth(nextMonth), "yyyy-MM-dd"),
   );
   const [filterType, setFilterType] = useState("all");
-  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterCategory] = useState("all");
   const [filterMinAmount, setFilterMinAmount] = useState("");
   const [filterMaxAmount, setFilterMaxAmount] = useState("");
   
@@ -269,7 +268,7 @@ export default function FinanceiroPage() {
       }
       setIsAddEditOpen(false);
       fetchData();
-    } catch (error) {
+    } catch {
       toast.error("Erro ao salvar transação.");
     }
   };
@@ -282,7 +281,7 @@ export default function FinanceiroPage() {
       toast.success("Transação excluída com sucesso!");
       setIsDeleteOpen(false);
       fetchData();
-    } catch (error) {
+    } catch {
       toast.error("Erro ao excluir transação.");
     }
   };
@@ -360,7 +359,7 @@ export default function FinanceiroPage() {
       setIsBulkEditOpen(false);
       setSelectedTxIds([]);
       fetchData();
-    } catch (error) {
+    } catch {
       toast.error("Erro ao atualizar transações em lote.");
     }
   };
@@ -375,7 +374,7 @@ export default function FinanceiroPage() {
       setIsBulkDeleteOpen(false);
       setSelectedTxIds([]);
       fetchData();
-    } catch (error) {
+    } catch {
       toast.error("Erro ao excluir transações em lote.");
     }
   };
@@ -396,7 +395,7 @@ export default function FinanceiroPage() {
       setIsBulkDuplicateOpen(false);
       setSelectedTxIds([]);
       fetchData();
-    } catch (error) {
+    } catch {
       toast.error("Erro ao duplicar transações em lote.");
     }
   };

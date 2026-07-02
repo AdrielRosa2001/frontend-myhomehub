@@ -128,7 +128,7 @@
 129|      setNewItemName("");
 130|      toast.success("Item adicionado!");
 131|      fetchList();
-132|    } catch (error) {
+132|    } catch {
 133|      toast.error("Erro ao adicionar item.");
 134|    }
 135|  };
@@ -147,7 +147,7 @@
 148|        is_completed: !item.is_completed,
 149|      });
 150|      fetchList();
-151|    } catch (error) {
+151|    } catch {
 152|      toast.error("Erro ao atualizar item.");
 153|    }
 154|  };
@@ -183,7 +183,7 @@
 184|      setIsItemEditOpen(false);
 185|      setEditingItem(null);
 186|      fetchList();
-187|    } catch (error) {
+187|    } catch {
 188|      toast.error("Erro ao salvar item.");
 189|    }
 190|  };
@@ -202,7 +202,7 @@
 203|      setIsDeleteItemOpen(false);
 204|      setItemToDelete(null);
 205|      fetchList();
-206|    } catch (error) {
+206|    } catch {
 207|      toast.error("Erro ao excluir item.");
 208|    }
 209|  };
@@ -214,7 +214,7 @@
 215|      await api.post(`/lists/${listId}/archive`);
 216|      toast.success("Lista atualizada!");
 217|      router.push("/lists");
-218|    } catch (error) {
+218|    } catch {
 219|      toast.error("Erro ao atualizar lista.");
 220|    }
 221|  };
@@ -225,7 +225,7 @@
 226|      await api.post(`/lists/${listId}/duplicate`);
 227|      toast.success("Lista duplicada!");
 228|      router.push("/lists");
-229|    } catch (error) {
+229|    } catch {
 230|      toast.error("Erro ao duplicar lista.");
 231|    }
 232|  };
@@ -236,7 +236,7 @@
 237|      await api.delete(`/lists/${listId}`);
 238|      toast.success("Lista excluída!");
 239|      router.push("/lists");
-240|    } catch (error) {
+240|    } catch {
 241|      toast.error("Erro ao excluir lista.");
 242|    }
 243|  };
