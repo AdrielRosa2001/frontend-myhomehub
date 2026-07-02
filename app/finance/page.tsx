@@ -220,14 +220,17 @@ export default function FinanceiroPage() {
     }
   };
 
+  // Auth check
   useEffect(() => {
     const token = localStorage.getItem("dmapla_token");
     if (!token) {
       router.push("/login");
-    } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      fetchData();
     }
+  }, [router]);
+
+  // Data fetch
+  useEffect(() => {
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
