@@ -268,8 +268,9 @@ export default function ListDetailPage() {
   const totalEstimated = items
     .filter((i) => !i.is_completed)
     .reduce((sum, i) => {
-      if (i.price && i.quantity) {
-        return sum + i.price * i.quantity;
+      const qty = i.quantity || 1;
+      if (i.price) {
+        return sum + i.price * qty;
       }
       return sum;
     }, 0);
