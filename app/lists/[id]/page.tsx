@@ -372,11 +372,15 @@ export default function ListDetailPage() {
       )}
 
       {/* Card de Valor Total Estimado (shopping) */}
-      {list.type === "shopping" && totalEstimated > 0 && (
+      {list.type === "shopping" && (
         <Card className="bg-zinc-950 border-zinc-800 mb-6">
-          <CardContent className="p-4 flex items-center justify-between">
+          <CardContent className="flex items-center justify-between p-4">
             <span className="text-sm text-slate-400">Valor total estimado (itens pendentes)</span>
-            <span className="text-lg font-bold text-emerald-400">{formatBRL(totalEstimated)}</span>
+            <span className={`text-lg font-bold ${
+              totalEstimated > 0 ? "text-emerald-400" : "text-zinc-500"
+            }`}>
+              {totalEstimated > 0 ? formatBRL(totalEstimated) : "R$ 0,00"}
+            </span>
           </CardContent>
         </Card>
       )}
