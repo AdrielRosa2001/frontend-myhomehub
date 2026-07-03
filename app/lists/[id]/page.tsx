@@ -54,6 +54,13 @@ const typeIcons: Record<string, { icon: React.ReactNode; label: string }> = {
   bullet: { icon: <ListTodo className="h-5 w-5" />, label: "Simples" },
 };
 
+function formatBRL(value: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
+}
+
 export default function ListDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -65,6 +72,7 @@ export default function ListDetailPage() {
 
   // Input rápido
   const [newItemName, setNewItemName] = useState("");
+  const [newItemPrice, setNewItemPrice] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Modal editar item
@@ -121,9 +129,18 @@ export default function ListDetailPage() {
     const name = newItemName.trim();
     if (!name) return;
 
+    const body: Record<string, unknown> = { text: name };
+    if (list?.type === "shopping" && newItemPrice.trim()) {
+      const priceVal = parseFloat(newItemPrice.replace(",", "."));
+      if (!isNaN(priceVal) && priceVal > 0) {
+        body.price = priceVal;
+      }
+    }
+
     try {
-      await api.post(`/lists/${listId}/items`, { text: name });
+      await api.post(`/lists/${listId}/items`, body);
       setNewItemName("");
+      setNewItemPrice("");
       toast.success("Item adicionado!");
       fetchList();
     } catch {
@@ -159,6 +176,7 @@ export default function ListDetailPage() {
       unit: item.unit,
       category: item.category,
       priority: item.priority,
+      price: item.price,
     });
     setIsItemEditOpen(true);
   };
@@ -176,6 +194,7 @@ export default function ListDetailPage() {
         unit: editingItem.unit,
         category: editingItem.category,
         priority: editingItem.priority,
+        price: editingItem.price,
       });
       toast.success("Item atualizado!");
       setIsItemEditOpen(false);
@@ -244,6 +263,16 @@ export default function ListDetailPage() {
   const filteredCount = filteredItems.length;
   const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const typeInfo = list ? typeIcons[list.type] || typeIcons.bullet : typeIcons.bullet;
+
+  // Cálculo de valor total estimado (shopping, itens não-completos)
+  const totalEstimated = items
+    .filter((i) => !i.is_completed)
+    .reduce((sum, i) => {
+      if (i.price && i.quantity) {
+        return sum + i.price * i.quantity;
+      }
+      return sum;
+    }, 0);
 
   if (loading) {
     return (
@@ -342,6 +371,16 @@ export default function ListDetailPage() {
         </Card>
       )}
 
+      {/* Card de Valor Total Estimado (shopping) */}
+      {list.type === "shopping" && totalEstimated > 0 && (
+        <Card className="bg-zinc-950 border-zinc-800 mb-6">
+          <CardContent className="p-4 flex items-center justify-between">
+            <span className="text-sm text-slate-400">Valor total estimado (itens pendentes)</span>
+            <span className="text-lg font-bold text-emerald-400">{formatBRL(totalEstimated)}</span>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Input rápido para adicionar item */}
       <form onSubmit={handleAddItem} className="mb-6">
         <div className="flex gap-2">
@@ -355,6 +394,14 @@ export default function ListDetailPage() {
               className="pl-9 bg-zinc-900 border-zinc-800 h-10 text-sm"
             />
           </div>
+          {list.type === "shopping" && (
+            <Input
+              placeholder="Preço R$"
+              value={newItemPrice}
+              onChange={(e) => setNewItemPrice(e.target.value)}
+              className="w-28 bg-zinc-900 border-zinc-800 h-10 text-sm"
+            />
+          )}
           <Button
             type="submit"
             className="bg-white text-black hover:bg-slate-200"
@@ -403,6 +450,15 @@ export default function ListDetailPage() {
                       <span className="text-[11px] text-slate-500 bg-zinc-900 px-1.5 py-0.5 rounded">
                         {item.quantity && `${item.quantity}`}
                         {item.unit && ` ${item.unit}`}
+                      </span>
+                    )}
+                    {/* Preço (shopping) */}
+                    {item.price != null && (
+                      <span className="text-[11px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                        {formatBRL(item.price)}
+                        {item.quantity && item.quantity > 0
+                          ? ` (${formatBRL(item.price * item.quantity)} total)`
+                          : ""}
                       </span>
                     )}
                     {/* Categoria (shopping) */}
@@ -511,6 +567,24 @@ export default function ListDetailPage() {
                       }
                     />
                   </div>
+                </div>
+                {/* Preço unitário */}
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Preço unitário (R$)</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="bg-zinc-900 border-zinc-800"
+                    placeholder="0,00"
+                    value={editingItem?.price ?? ""}
+                    onChange={(e) =>
+                      setEditingItem((prev) => ({
+                        ...prev,
+                        price: e.target.value ? parseFloat(e.target.value) : undefined,
+                      }))
+                    }
+                  />
                 </div>
                 <div className="grid gap-2">
                   <label className="text-sm font-medium">Categoria</label>

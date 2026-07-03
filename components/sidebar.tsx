@@ -6,27 +6,47 @@ import {
   ListTodo,
   LogOut,
   Menu,
+  Shield,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-const navLinks = [
-  { href: "/", label: "Home", icon: LayoutDashboard },
-  { href: "/finance", label: "Financeiro", icon: DollarSign },
-  { href: "/lists", label: "Listas", icon: ListTodo },
-];
+function parseModules(modulesStr: string | null): string[] {
+  if (!modulesStr) return [];
+  try {
+    const parsed = JSON.parse(modulesStr);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isSuperuser, setIsSuperuser] = useState(false);
+  const [modules, setModules] = useState<string[]>([]);
+
+  useEffect(() => {
+    const su = localStorage.getItem("user_is_superuser");
+    const mods = localStorage.getItem("user_modules");
+    if (su !== null) setIsSuperuser(su === "true");
+    if (mods !== null) {
+      setModules(parseModules(mods));
+    } else {
+      setModules(["finance", "lists"]);
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("dmapla_token");
+    localStorage.removeItem("user_is_superuser");
+    localStorage.removeItem("user_modules");
     router.push("/login");
   };
 
@@ -34,6 +54,13 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   };
+
+  const navLinks = [
+    { href: "/", label: "Home", icon: LayoutDashboard, show: true },
+    { href: "/finance", label: "Financeiro", icon: DollarSign, show: modules.includes("finance") },
+    { href: "/lists", label: "Listas", icon: ListTodo, show: modules.includes("lists") },
+    { href: "/admin/users", label: "Admin", icon: Shield, show: isSuperuser },
+  ].filter((link) => link.show);
 
   return (
     <div className="flex min-h-screen bg-black">

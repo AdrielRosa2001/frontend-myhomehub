@@ -409,6 +409,7 @@ function ListCard({
   const completed = (list as List & { completed_count?: number }).completed_count ?? 0;
   const total = (list as List & { item_count?: number }).item_count ?? 0;
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const totalPrice = (list as List & { total_price?: number }).total_price ?? 0;
 
   return (
     <Card className="bg-zinc-950 border-zinc-800 cursor-pointer hover:border-zinc-700 transition-colors">
@@ -447,6 +448,12 @@ function ListCard({
                 style={{ width: `${progress}%` }}
               />
             </div>
+          )}
+          {list.type === "shopping" && totalPrice > 0 && (
+            <p className="text-xs text-emerald-400 font-medium mt-2">
+              Valor total estimado:{" "}
+              {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalPrice)}
+            </p>
           )}
           <p className="text-[10px] text-slate-600 mt-2">
             Atualizada em {format(new Date(list.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}

@@ -30,7 +30,16 @@ export interface ListItem {
   quantity?: number | null;
   unit?: string | null;
   category?: string | null;
+  price?: number | null;
   created_by?: number | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  is_active: boolean;
+  is_superuser: boolean;
+  modules: string;  // JSON string: '["finance","lists"]'
 }

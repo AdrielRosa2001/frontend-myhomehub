@@ -35,8 +35,10 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
-      // Salva o token e redireciona para o dashboard
+      // Salva o token e dados do usuário
       localStorage.setItem("dmapla_token", response.data.access_token);
+      localStorage.setItem("user_is_superuser", response.data.is_superuser);
+      localStorage.setItem("user_modules", response.data.modules);
       toast.success("Login efetuado com sucesso!");
       router.push("/");
     } catch {
