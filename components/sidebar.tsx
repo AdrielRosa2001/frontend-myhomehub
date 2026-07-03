@@ -47,7 +47,9 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
       {/* Mobile hamburger button */}
       <button
-        className="fixed top-3 left-3 z-50 flex h-9 w-9 items-center justify-center rounded-md bg-zinc-950 border border-zinc-800 text-slate-300 md:hidden"
+        className={`fixed top-3 left-3 z-50 flex h-9 w-9 items-center justify-center rounded-md bg-zinc-950 border border-zinc-800 text-slate-300 md:hidden ${
+          isMobileOpen ? "hidden" : ""
+        }`}
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         aria-label={isMobileOpen ? "Fechar menu" : "Abrir menu"}
       >
