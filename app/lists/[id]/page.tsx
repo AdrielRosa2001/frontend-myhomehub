@@ -2,6 +2,7 @@
 
 import { api } from "@/lib/api";
 import type { List, ListItem } from "@/lib/types";
+import { applyToggle, sortItemsByCompletion } from "@/lib/sort";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -155,14 +156,23 @@ export default function ListDetailPage() {
       )
     : items;
 
-  // Marcar/desmarcar conclusão
+  // Itens ordenados dinamicamente: não-marcados primeiro, marcados por último
+  const sortedItems = sortItemsByCompletion(filteredItems);
+
+  // Marcar/desmarcar conclusão (otimista: reflete imediatamente, reverte em erro)
   const handleToggleItem = async (item: ListItem) => {
+    const newCompleted = !item.is_completed;
+
+    // Atualização otimista — independe da latência da requisição
+    setItems((prev) => applyToggle(prev, item.id, newCompleted));
+
     try {
       await api.patch(`/lists/${listId}/items/${item.id}`, {
-        is_completed: !item.is_completed,
+        is_completed: newCompleted,
       });
-      fetchList();
     } catch {
+      // Rollback: se o servidor falhar, desfaz a marcação
+      setItems((prev) => applyToggle(prev, item.id, !newCompleted));
       toast.error("Erro ao atualizar item.");
     }
   };
@@ -260,7 +270,6 @@ export default function ListDetailPage() {
 
   const completedCount = items.filter((i) => i.is_completed).length;
   const totalCount = items.length;
-  const filteredCount = filteredItems.length;
   const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const typeInfo = list ? typeIcons[list.type] || typeIcons.bullet : typeIcons.bullet;
 
@@ -417,11 +426,9 @@ export default function ListDetailPage() {
       </form>
 
       {/* Lista de Itens */}
-      {filteredItems.length > 0 ? (
+      {sortedItems.length > 0 ? (
         <div className="space-y-2">
-          {filteredItems
-            .sort((a, b) => a.position - b.position)
-            .map((item) => (
+          {sortedItems.map((item) => (
               <div
                 key={item.id}
                 className={`flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-950/50 p-3 md:p-4 transition-all ${
@@ -440,8 +447,11 @@ export default function ListDetailPage() {
                   {item.is_completed && <Check className="h-3 w-3 text-white" />}
                 </button>
 
-                {/* Informações do item */}
-                <div className="flex-1 min-w-0">
+                {/* Informações do item — clicar no texto também marca/desmarca */}
+                <div
+                  className="flex-1 min-w-0 cursor-pointer"
+                  onClick={() => handleToggleItem(item)}
+                >
                   <p
                     className={`text-sm font-medium ${
                       item.is_completed ? "line-through text-slate-500" : "text-slate-50"

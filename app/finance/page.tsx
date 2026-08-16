@@ -1,6 +1,9 @@
 "use client";
 
 import { api } from "@/lib/api";
+import type { Transaction } from "@/lib/types";
+import { sortTransactionsByDate } from "@/lib/sort";
+import { formatCurrencyBRL as formatCurrency } from "@/lib/utils";
 import { addMonths, endOfMonth, format, startOfMonth } from "date-fns";
 
 import {
@@ -68,16 +71,6 @@ import {
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 // Tipagens
-interface Transaction {
-  id: number;
-  description: string;
-  amount: number;
-  type: "receita" | "despesa";
-  category: string;
-  date: string;
-  is_paid: boolean;
-}
-
 interface Summary {
   total_receitas: number;
   total_despesas: number;
@@ -147,15 +140,8 @@ export default function FinanceiroPage() {
 
   // Adicionado: Estados de Ordenação e Busca
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<string | null>("date");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  // Formatar Moeda
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
 
   // Logout
   const handleLogout = () => {
@@ -466,14 +452,10 @@ export default function FinanceiroPage() {
     }
 
     // 2. Ordenação
-    if (sortField) {
+    if (sortField === "date") {
+      list = sortTransactionsByDate(list, sortDirection);
+    } else if (sortField) {
       list = [...list].sort((a, b) => {
-        if (sortField === "date") {
-          const aTime = new Date(a.date).getTime();
-          const bTime = new Date(b.date).getTime();
-          return sortDirection === "asc" ? aTime - bTime : bTime - aTime;
-        }
-
         if (sortField === "amount") {
           const aVal = a.type === "receita" ? a.amount : -a.amount;
           const bVal = b.type === "receita" ? b.amount : -b.amount;
@@ -553,6 +535,16 @@ export default function FinanceiroPage() {
     stroke: { curve: "smooth", width: 2 },
     xaxis: {
       categories: monthlyChartData.map((d) => d.month),
+    },
+    yaxis: {
+      labels: {
+        formatter: (value: number) => formatCurrency(value),
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: (value: number) => formatCurrency(value),
+      },
     },
     theme: { mode: "dark" },
     grid: { borderColor: "#27272a", strokeDashArray: 4 },

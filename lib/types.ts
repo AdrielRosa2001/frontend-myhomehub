@@ -1,4 +1,4 @@
-// Tipos compartilhados para o módulo de Listas
+// Tipos compartilhados para os módulos de Listas e Financeiro
 // Mapeados conforme o backend (Peewee + FastAPI)
 
 export type ListType = "shopping" | "todo" | "bullet";
@@ -36,10 +36,20 @@ export interface ListItem {
   updated_at: string;
 }
 
+export interface Transaction {
+  id: number;
+  description: string;
+  amount: number;
+  type: "receita" | "despesa";
+  category: string;
+  date: string;
+  is_paid: boolean;
+}
+
 export interface User {
   id: number;
   email: string;
   is_active: boolean;
   is_superuser: boolean;
-  modules: string;  // JSON string: '["finance","lists"]'
+  modules: string; // JSON string: '["finance","lists"]'
 }
