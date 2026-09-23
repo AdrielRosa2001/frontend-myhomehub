@@ -9,7 +9,6 @@ import {
   ArchiveRestore,
   Copy,
   ListTodo,
-  LogOut,
   Pencil,
   Plus,
   Search,
@@ -98,11 +97,6 @@ export default function ListsPage() {
       fetchLists(showArchived);
     }
   }, [showArchived]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("dmapla_token");
-    router.push("/login");
-  };
 
   // Criar lista
   const openCreateModal = () => {
@@ -216,14 +210,6 @@ export default function ListsPage() {
             className="bg-white text-black hover:bg-slate-200"
           >
             <Plus className="mr-2 h-4 w-4" /> Nova Lista
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleLogout}
-            title="Sair do sistema"
-          >
-            <LogOut className="h-5 w-5 text-slate-400 hover:text-red-400" />
           </Button>
         </div>
       </header>

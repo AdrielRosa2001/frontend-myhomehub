@@ -1,10 +1,9 @@
 "use client";
 
-import { DollarSign, ListTodo, LogOut } from "lucide-react";
+import { DollarSign, ListTodo } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const modules = [
@@ -33,29 +32,14 @@ export default function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("dmapla_token");
-    router.push("/login");
-  };
-
   return (
     <div className="min-h-screen bg-black text-slate-50 p-4 md:p-8">
       {/* Header */}
-      <header className="mb-12 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">MyHomeHub</h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Selecione um módulo para começar
-          </p>
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleLogout}
-          title="Sair do sistema"
-        >
-          <LogOut className="h-5 w-5 text-slate-400 hover:text-red-400" />
-        </Button>
+      <header className="mb-12">
+        <h1 className="text-3xl font-bold tracking-tight">MyHomeHub</h1>
+        <p className="text-slate-400 text-sm mt-1">
+          Selecione um módulo para começar
+        </p>
       </header>
 
       {/* Cards Grid */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import Sidebar from "@/components/sidebar";
+import BottomNav from "@/components/bottom-nav";
 
 export default function AppShell({
   children,
@@ -10,10 +10,10 @@ export default function AppShell({
 }) {
   const pathname = usePathname();
 
-  // Login page doesn't have sidebar
+  // Login page doesn't have bottom nav
   if (pathname === "/login") {
     return <>{children}</>;
   }
 
-  return <Sidebar>{children}</Sidebar>;
+  return <BottomNav>{children}</BottomNav>;
 }

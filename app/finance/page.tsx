@@ -11,7 +11,6 @@ import {
   Circle,
   DollarSign,
   Filter,
-  LogOut,
   Pencil,
   Plus,
   Trash2,
@@ -142,12 +141,6 @@ export default function FinanceiroPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<string | null>("date");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  // Logout
-  const handleLogout = () => {
-    localStorage.removeItem("dmapla_token");
-    router.push("/login");
-  };
 
   // Busca os dados da API (Agora com Filtros)
   const fetchData = async () => {
@@ -702,15 +695,6 @@ export default function FinanceiroPage() {
             className="bg-white text-black hover:bg-slate-200"
           >
             <Plus className="mr-2 h-4 w-4" /> Nova
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleLogout}
-            title="Sair do sistema"
-          >
-            <LogOut className="h-5 w-5 text-slate-400 hover:text-red-400" />
           </Button>
         </div>
       </header>
