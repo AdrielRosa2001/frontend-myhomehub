@@ -13,6 +13,9 @@ export interface List {
   icon?: string | null;
   status: ListStatus;
   position: number;
+  total_price?: number;
+  item_count?: number;
+  completed_count?: number;
   created_at: string;
   updated_at: string;
   deleted_at?: string | null;

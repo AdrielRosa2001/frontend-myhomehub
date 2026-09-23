@@ -392,10 +392,10 @@ function ListCard({
   onClick: () => void;
 }) {
   const typeInfo = typeIcons[list.type];
-  const completed = (list as List & { completed_count?: number }).completed_count ?? 0;
-  const total = (list as List & { item_count?: number }).item_count ?? 0;
+  const completed = list.completed_count ?? 0;
+  const total = list.item_count ?? 0;
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
-  const totalPrice = (list as List & { total_price?: number }).total_price ?? 0;
+  const totalPrice = list.total_price ?? 0;
 
   return (
     <Card className="bg-zinc-950 border-zinc-800 cursor-pointer hover:border-zinc-700 transition-colors">
@@ -423,7 +423,7 @@ function ListCard({
             <span className="bg-zinc-900 px-2 py-0.5 rounded">{typeInfo.label}</span>
             {total > 0 && (
               <span>
-                {completed}/{total} concluídos
+                {completed}/{total} concluídos ({progress}%)
               </span>
             )}
           </div>
@@ -435,11 +435,13 @@ function ListCard({
               />
             </div>
           )}
-          {list.type === "shopping" && totalPrice > 0 && (
-            <p className="text-xs text-emerald-400 font-medium mt-2">
-              Valor total estimado:{" "}
-              {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalPrice)}
-            </p>
+          {list.type === "shopping" && (
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-xs text-slate-500">Valor total</span>
+              <span className={`text-sm font-semibold ${totalPrice > 0 ? "text-emerald-400" : "text-slate-600"}`}>
+                {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalPrice)}
+              </span>
+            </div>
           )}
           <p className="text-[10px] text-slate-600 mt-2">
             Atualizada em {format(new Date(list.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}

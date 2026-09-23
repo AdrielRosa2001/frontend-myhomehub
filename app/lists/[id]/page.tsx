@@ -273,16 +273,14 @@ export default function ListDetailPage() {
   const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const typeInfo = list ? typeIcons[list.type] || typeIcons.bullet : typeIcons.bullet;
 
-  // Cálculo de valor total estimado (shopping, itens não-completos)
-  const totalEstimated = items
-    .filter((i) => !i.is_completed)
-    .reduce((sum, i) => {
-      const qty = i.quantity || 1;
-      if (i.price) {
-        return sum + i.price * qty;
-      }
-      return sum;
-    }, 0);
+  // Cálculo de valor total estimado (shopping, todos os itens)
+  const totalEstimated = items.reduce((sum, i) => {
+    const qty = i.quantity || 1;
+    if (i.price) {
+      return sum + i.price * qty;
+    }
+    return sum;
+  }, 0);
 
   if (loading) {
     return (
@@ -385,7 +383,7 @@ export default function ListDetailPage() {
       {list.type === "shopping" && (
         <Card className="bg-zinc-950 border-zinc-800 mb-6">
           <CardContent className="flex items-center justify-between p-4">
-            <span className="text-sm text-slate-400">Valor total estimado (itens pendentes)</span>
+            <span className="text-sm text-slate-400">Valor total estimado</span>
             <span className={`text-lg font-bold ${
               totalEstimated > 0 ? "text-emerald-400" : "text-zinc-500"
             }`}>
@@ -546,7 +544,7 @@ export default function ListDetailPage() {
                 className="bg-zinc-900 border-zinc-800"
                 value={editingItem?.text || ""}
                 onChange={(e) =>
-                  setEditingItem((prev) => ({ ...prev, name: e.target.value }))
+                  setEditingItem((prev) => ({ ...prev, text: e.target.value }))
                 }
               />
             </div>
